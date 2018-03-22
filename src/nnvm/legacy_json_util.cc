@@ -187,10 +187,10 @@ Graph LoadLegacyJSONPass(Graph g) {
               << ". May cause undefined behavior. "
               << "Please update MXNet if you encounter any issue";
   } else if (version < MXNET_VERSION) {
-    LOG(INFO) << "Loading symbol saved by previous version v"
-              << version/10000 << "." << (version/100)%100 << "." << version%100
-              << ". Attempting to upgrade...";
-    upgrading = true;
+//     LOG(INFO) << "Loading symbol saved by previous version v"
+//               << version/10000 << "." << (version/100)%100 << "." << version%100
+//               << ". Attempting to upgrade...";
+//     upgrading = true;
   }
   for (auto it = upgrader_list.begin(); it != upgrader_list.end(); ++it) {
     if (it->first > version) load = it->second(load);
