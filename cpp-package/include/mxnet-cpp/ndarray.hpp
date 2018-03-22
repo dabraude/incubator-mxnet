@@ -296,6 +296,57 @@ inline std::vector<NDArray> NDArray::LoadToList(const std::string &file_name) {
   }
   return array_list;
 }
+inline void NDArray::LoadFromBuffer(const void *buffer, size_t size,
+                          std::vector<NDArray> *array_list,
+                          std::map<std::string, NDArray> *array_map) {
+  mx_uint out_size, out_name_size;
+  NDArrayHandle *out_arr;
+  const char **out_names;
+  CHECK_EQ(MXNDArrayLoadFromBuffer(buffer, size, &out_size, &out_arr, &out_name_size,
+                         &out_names),
+           0);
+  if (array_list != nullptr) {
+    for (mx_uint i = 0; i < out_size; ++i) {
+      array_list->push_back(NDArray(out_arr[i]));
+    }
+  }
+  if (array_map != nullptr && out_name_size > 0) {
+    CHECK_EQ(out_name_size, out_size);
+    for (mx_uint i = 0; i < out_size; ++i) {
+      (*array_map)[out_names[i]] = NDArray(out_arr[i]);
+    }
+  }
+}
+inline std::map<std::string, NDArray> NDArray::LoadFromBufferToMap(
+    const void *buffer, size_t size) {
+  std::map<std::string, NDArray> array_map;
+  mx_uint out_size, out_name_size;
+  NDArrayHandle *out_arr;
+  const char **out_names;
+  CHECK_EQ(MXNDArrayLoadFromBuffer(buffer, size, &out_size, &out_arr, &out_name_size,
+                         &out_names),
+           0);
+  if (out_name_size > 0) {
+    CHECK_EQ(out_name_size, out_size);
+    for (mx_uint i = 0; i < out_size; ++i) {
+      array_map[out_names[i]] = NDArray(out_arr[i]);
+    }
+  }
+  return array_map;
+}
+inline std::vector<NDArray> NDArray::LoadFromBufferToList(const void *buffer, size_t size) {
+  std::vector<NDArray> array_list;
+  mx_uint out_size, out_name_size;
+  NDArrayHandle *out_arr;
+  const char **out_names;
+  CHECK_EQ(MXNDArrayLoadFromBuffer(buffer, size, &out_size, &out_arr, &out_name_size,
+                         &out_names),
+           0);
+  for (mx_uint i = 0; i < out_size; ++i) {
+    array_list.push_back(NDArray(out_arr[i]));
+  }
+  return array_list;
+}
 inline void NDArray::Save(const std::string &file_name,
                           const std::map<std::string, NDArray> &array_map) {
   std::vector<NDArrayHandle> args;
